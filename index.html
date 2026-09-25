@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ข้อสอบ ม.1">
+<meta name="theme-color" content="#1a5f9e">
+<title>แนวข้อสอบคณิตศาสตร์ ม.1 ห้องเรียนพิเศษ (iPad)</title>
+<style>
+  :root{--main:#1a5f9e;--ok:#0a8a4a;--bad:#c62828;--bg:#eef1f5;--pad:env(safe-area-inset-bottom,0px);}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;font-family:-apple-system,"Sarabun","Noto Sans Thai",sans-serif;
+       background:var(--bg);color:#111;font-size:19px;line-height:1.6;
+       padding-bottom:calc(150px + var(--pad));-webkit-user-select:none;user-select:none;}
+  header{background:var(--main);color:#fff;padding:16px 20px;padding-top:calc(16px + env(safe-area-inset-top,0px));}
+  header h1{margin:0;font-size:22px;font-weight:700;}
+  header p{margin:5px 0 0;font-size:15px;opacity:.92;}
+  .bar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.96);
+       -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+       border-bottom:2px solid #d5dae1;padding:10px 16px;
+       display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  .clock{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--main);min-width:170px;}
+  .clock.warn{color:#e65100;} .clock.over{color:var(--bad);}
+  button,select{font-family:inherit;font-size:17px;min-height:48px;padding:10px 18px;
+       border-radius:12px;border:1.5px solid #c2c8d0;background:#fff;color:#111;cursor:pointer;}
+  button:active{transform:scale(.96);}
+  button.primary{background:var(--main);color:#fff;border-color:var(--main);font-weight:700;}
+  .prog{font-size:16px;color:#555;font-weight:600;margin-left:auto;}
+  main{max-width:900px;margin:0 auto;padding:16px;}
+  .banner{background:#fff8e1;border:1.5px solid #f0c040;border-radius:12px;
+       padding:12px 16px;margin-bottom:14px;font-size:16px;display:none;}
+  .banner.show{display:block;}
+  .secthead{background:#2b2b2b;color:#fff;text-align:center;padding:13px;
+       border-radius:14px;margin:28px 0 10px;font-weight:700;font-size:18px;}
+  .part{background:#dde6f0;border-left:6px solid var(--main);padding:10px 16px;
+       margin:22px 0 12px;font-weight:700;border-radius:0 12px 12px 0;}
+  .q{background:#fff;border:1.5px solid #e2e6ea;border-radius:16px;
+       padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+  .q.correct{border-color:var(--ok);background:#f3fbf6;}
+  .q.wrong{border-color:var(--bad);background:#fdf5f5;}
+  .qnum{font-weight:800;color:var(--main);}
+  .choices{margin-top:14px;display:grid;gap:10px;}
+  @media(min-width:760px){.choices{grid-template-columns:1fr 1fr;}}
+  .choices label{display:flex;gap:12px;align-items:center;min-height:58px;
+       padding:12px 16px;border:2px solid #dfe4ea;border-radius:14px;background:#fafbfc;font-size:18px;}
+  .choices label.sel{border-color:var(--main);background:#e7f0fa;font-weight:700;}
+  .choices input{width:24px;height:24px;accent-color:var(--main);flex:none;}
+  .sa input{width:100%;min-height:60px;padding:12px 16px;border:2px solid #c2c8d0;
+       border-radius:14px;font-size:22px;font-family:inherit;font-weight:700;
+       text-align:center;background:#fff;-webkit-user-select:text;user-select:text;}
+  .sa input:focus{border-color:var(--main);outline:none;background:#f5faff;}
+  .hint{font-size:14px;color:#777;margin-top:6px;text-align:center;}
+  .tools{margin-top:14px;}
+  .tools button{width:100%;background:#f2f5f8;font-weight:600;}
+  .exp{display:none;margin-top:14px;padding:14px 18px;background:#fffdf2;
+       border:2px dashed #d4ac2f;border-radius:14px;font-size:17.5px;line-height:1.7;}
+  .exp.show{display:block;}
+  .exp b.key{color:var(--ok);}
+  .mark{font-weight:800;font-size:17px;}
+  .mark.ok{color:var(--ok);} .mark.no{color:var(--bad);}
+  /* แป้นตัวเลข */
+  #pad{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#d3d7de;
+       padding:10px 10px calc(10px + var(--pad));display:none;
+       box-shadow:0 -4px 16px rgba(0,0,0,.18);}
+  #pad.show{display:block;}
+  #padTop{font-size:15px;color:#333;text-align:center;padding-bottom:8px;font-weight:600;}
+  #padGrid{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  #padGrid button{min-height:56px;font-size:23px;font-weight:700;border-radius:12px;
+       border:none;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  #padGrid button.gray{background:#aab0b9;color:#fff;}
+  #padGrid button.blue{background:var(--main);color:#fff;}
+  /* แถบล่าง */
+  #dock{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.97);
+       -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+       border-top:2px solid #d5dae1;padding:10px 16px calc(10px + var(--pad));
+       display:flex;gap:12px;align-items:center;}
+  #dock .prog2{font-size:16px;font-weight:700;color:#444;}
+  #dock button{flex:1;font-size:19px;}
+  #result{display:none;background:#fff;border:3px solid var(--main);
+       border-radius:18px;padding:22px;margin:22px 0;}
+  #result.show{display:block;}
+  .big{font-size:52px;font-weight:800;color:var(--main);line-height:1.1;}
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:17px;}
+  th,td{border:1px solid #ccd2d8;padding:10px;text-align:center;}
+  th{background:#e9edf2;} td.left{text-align:left;}
+  .weak{background:#fff4e5;border-left:6px solid #ef6c00;padding:14px 18px;
+       border-radius:0 14px 14px 0;margin-top:16px;}
+  .weak.good{background:#e9f7ec;border-left-color:var(--ok);}
+  footer{text-align:center;font-size:14px;color:#777;padding:20px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>แนวข้อสอบคณิตศาสตร์ สอบเข้า ม.1 ห้องเรียนพิเศษ</h1>
+  <p>กำแพงเพชรพิทยาคม (SMTE / STEM) • วัชรวิทยา (EP, E-SMAT) — ปรนัย 20 + อัตนัย 10 (40 คะแนน)</p>
+</header>
+
+<div class="bar">
+  <span class="clock" id="clock">00:00 / 120:00</span>
+  <button id="btnPause">หยุดพัก</button>
+  <select id="setSel">
+    <option value="1">ชุดที่ 1 — มาตรฐาน</option>
+    <option value="2">ชุดที่ 2 — ยกระดับ</option>
+  </select>
+  <button id="btnReset">เริ่มใหม่</button>
+  <span class="prog" id="progress"></span>
+</div>
+
+<main>
+  <div class="banner" id="banner"></div>
+  <div id="quiz"></div>
+  <div id="result"></div>
+</main>
+
+<div id="dock">
+  <span class="prog2" id="prog2">0/30</span>
+  <button class="primary" id="btnSubmit">ส่งคำตอบทั้งหมด</button>
+</div>
+
+<div id="pad">
+  <div id="padTop">แป้นกรอกคำตอบ — ใช้ / สำหรับเศษส่วน, : สำหรับอัตราส่วน</div>
+  <div id="padGrid">
+    <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="/" class="gray">/</button>
+    <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k=":" class="gray">:</button>
+    <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="," class="gray">,</button>
+    <button data-k="0">0</button><button data-k=".">.</button><button data-k="BS" class="gray">⌫</button><button data-k="OK" class="blue">เสร็จ</button>
+  </div>
+</div>
+
+<footer>แนวข้อสอบฝึกซ้อม — ไม่ใช่ข้อสอบจริงของโรงเรียน</footer>
+
+<script>
+const PARTS=["","ตอนที่ 1 จำนวนและการดำเนินการ","ตอนที่ 2 ร้อยละ อัตราส่วน และการประยุกต์",
+"ตอนที่ 3 งานและอัตรา","ตอนที่ 4 เรขาคณิตและการวัด","ตอนที่ 5 แบบรูป สถิติ และเชาวน์"];
+
+const DATA={
+1:[
+{p:1,t:"mc",q:"ห.ร.ม. ของ 48, 72 และ 120 มีค่าเท่าใด",c:["8","12","24","36"],a:2,
+e:"แยกตัวประกอบ 48 = 2⁴×3, 72 = 2³×3², 120 = 2³×3×5 ; ห.ร.ม. เลือกตัวร่วมกำลังต่ำสุด = 2³×3 = <b class='key'>24</b>"},
+{p:1,t:"mc",q:"2.5 × 0.04 ÷ 0.2 มีค่าเท่าใด",c:["0.05","0.5","5","50"],a:1,
+e:"คิดซ้ายไปขวา 2.5 × 0.04 = 0.1 ; 0.1 ÷ 0.2 = <b class='key'>0.5</b>"},
+{p:1,t:"mc",q:"(3/4 + 2/5) × 20/23 มีค่าเท่าใด",c:["1/2","4/5","1","23/20"],a:2,
+e:"ในวงเล็บก่อน 3/4 + 2/5 = 15/20 + 8/20 = 23/20 ; แล้ว 23/20 × 20/23 ตัดกันหมด = <b class='key'>1</b>"},
+{p:1,t:"mc",q:"ค.ร.น. ของ 12, 18 และ 30 มีค่าเท่าใด",c:["90","120","180","360"],a:2,
+e:"12 = 2²×3, 18 = 2×3², 30 = 2×3×5 ; ค.ร.น. เลือกทุกตัวกำลังสูงสุด = 2²×3²×5 = <b class='key'>180</b>"},
+{p:2,t:"mc",q:"ซื้อสินค้ามาราคา 600 บาท ขายไป 750 บาท ได้กำไรร้อยละเท่าใด",c:["15%","20%","25%","30%"],a:2,
+e:"กำไร = 750 − 600 = 150 บาท ; ร้อยละกำไรคิดฐานจาก<b>ราคาทุน</b> = 150 ÷ 600 × 100 = <b class='key'>25%</b>"},
+{p:2,t:"mc",q:"แบ่งเงิน 450 บาท ให้ ก และ ข ตามอัตราส่วน 2 : 3 ข จะได้เงินกี่บาท",c:["180","225","270","300"],a:2,
+e:"รวม 5 ส่วน ; 1 ส่วน = 450 ÷ 5 = 90 ; ข ได้ 3 ส่วน = <b class='key'>270 บาท</b> (ก ได้ 180)"},
+{p:2,t:"mc",q:"สินค้าราคา 950 บาท ลดราคา 20% ต้องจ่ายเงินกี่บาท",c:["190","720","760","780"],a:2,
+e:"จ่ายจริง 80% ของราคา → 950 × 0.8 = <b class='key'>760 บาท</b> (190 คือส่วนลด ไม่ใช่ราคาจ่าย)"},
+{p:2,t:"mc",q:"แผนที่มาตราส่วน 1 : 50,000 วัดระยะได้ 4 เซนติเมตร ระยะจริงเป็นเท่าใด",c:["0.2 กม.","2 กม.","20 กม.","200 กม."],a:1,
+e:"4 × 50,000 = 200,000 ซม. ; แปลงเป็นกิโลเมตร ÷ 100,000 = <b class='key'>2 กม.</b>"},
+{p:3,t:"mc",q:"ก ทำงานเสร็จใน 10 วัน ข ทำงานเดียวกันเสร็จใน 15 วัน ถ้าช่วยกันทำจะเสร็จในกี่วัน",c:["5 วัน","6 วัน","8 วัน","12 วัน"],a:1,
+e:"งานต่อวัน 1/10 + 1/15 = 3/30 + 2/30 = 1/6 → เสร็จใน <b class='key'>6 วัน</b>"},
+{p:3,t:"mc",q:"คนงาน 6 คน ทำงานเสร็จใน 20 วัน ถ้าใช้คนงาน 8 คน จะทำเสร็จในกี่วัน",c:["12 วัน","15 วัน","16 วัน","27 วัน"],a:1,
+e:"อัตราส่วนผกผัน: งานรวม = 6 × 20 = 120 คน-วัน → 120 ÷ 8 = <b class='key'>15 วัน</b>"},
+{p:3,t:"mc",q:"รถยนต์แล่นได้ 150 กิโลเมตร ใช้เวลา 2 ชั่วโมง 30 นาที มีความเร็วเฉลี่ยเท่าใด",c:["50 กม./ชม.","60 กม./ชม.","65 กม./ชม.","75 กม./ชม."],a:1,
+e:"แปลงเวลาเป็น 2.5 ชม. ก่อน → 150 ÷ 2.5 = <b class='key'>60 กม./ชม.</b>"},
+{p:3,t:"mc",q:"ก๊อก A เติมน้ำเต็มถังใน 12 นาที ก๊อก B เติมเต็มถังใน 24 นาที เปิดพร้อมกันจะเต็มถังในกี่นาที",c:["6 นาที","8 นาที","9 นาที","18 นาที"],a:1,
+e:"อัตรารวม 1/12 + 1/24 = 3/24 = 1/8 ของถังต่อนาที → <b class='key'>8 นาที</b>"},
+{p:4,t:"mc",q:"รูปสามเหลี่ยมมีมุมขนาด 40° และ 65° มุมที่เหลือมีขนาดกี่องศา",c:["65°","70°","75°","85°"],a:2,
+e:"ผลบวกมุมภายในสามเหลี่ยม = 180° → 180 − 105 = <b class='key'>75°</b>"},
+{p:4,t:"mc",q:"วงกลมรัศมี 7 เซนติเมตร มีพื้นที่เท่าใด (π ≈ 22/7)",c:["44 ตร.ซม.","77 ตร.ซม.","154 ตร.ซม.","308 ตร.ซม."],a:2,
+e:"πr² = (22/7) × 7 × 7 = 22 × 7 = <b class='key'>154 ตร.ซม.</b> (44 คือเส้นรอบวง)"},
+{p:4,t:"mc",q:"สี่เหลี่ยมผืนผ้ามีเส้นรอบรูป 48 ซม. ด้านยาวเป็น 2 เท่าของด้านกว้าง พื้นที่เท่าใด",c:["96 ตร.ซม.","128 ตร.ซม.","144 ตร.ซม.","256 ตร.ซม."],a:1,
+e:"ให้กว้าง x ยาว 2x → 2(3x) = 48 → x = 8, ยาว 16 → พื้นที่ 8 × 16 = <b class='key'>128 ตร.ซม.</b>"},
+{p:4,t:"mc",q:"กล่องทรงสี่เหลี่ยมมุมฉากกว้าง 8 ซม. ยาว 12 ซม. สูง 5 ซม. มีปริมาตรเท่าใด",c:["96 ลบ.ซม.","240 ลบ.ซม.","480 ลบ.ซม.","600 ลบ.ซม."],a:2,
+e:"กว้าง × ยาว × สูง = 8 × 12 × 5 = <b class='key'>480 ลบ.ซม.</b>"},
+{p:5,t:"mc",q:"จงหาพจน์ถัดไปของลำดับ 3, 6, 11, 18, 27, ___",c:["34","36","38","40"],a:2,
+e:"ผลต่างคือ 3, 5, 7, 9 (เพิ่มทีละ 2) → ถัดไป +11 = <b class='key'>38</b> (แต่ละพจน์คือ n² + 2)"},
+{p:5,t:"mc",q:"ค่าเฉลี่ยเลขคณิตของข้อมูล 12, 15, 18, 21, 24 มีค่าเท่าใด",c:["16","17","18","20"],a:2,
+e:"ผลรวม 90 ÷ 5 = <b class='key'>18</b> (ข้อมูลห่างเท่ากัน ค่าเฉลี่ยเท่ากับตัวกลางพอดี)"},
+{p:5,t:"mc",q:"มัธยฐานของข้อมูล 7, 3, 9, 5, 11, 4 มีค่าเท่าใด",c:["5","6","6.5","7"],a:1,
+e:"เรียงก่อน 3, 4, 5, 7, 9, 11 ; มี 6 จำนวน → (5 + 7) ÷ 2 = <b class='key'>6</b>"},
+{p:5,t:"mc",q:"ถ้าวันนี้เป็นวันพุธ อีก 100 วันข้างหน้าจะตรงกับวันอะไร",c:["วันพฤหัสบดี","วันศุกร์","วันเสาร์","วันอาทิตย์"],a:1,
+e:"100 ÷ 7 = 14 เศษ 2 → นับจากพุธไป 2 วัน = <b class='key'>วันศุกร์</b>"},
+{p:1,t:"sa",q:"จงหาจำนวนนับที่น้อยที่สุดที่มากกว่า 100 และหารด้วย 8 และ 12 ลงตัวทั้งคู่",a:["120"],
+e:"ค.ร.น.(8, 12) = 24 → พหุคูณคือ 24, 48, 72, 96, 120 → ตัวแรกที่มากกว่า 100 คือ <b class='key'>120</b>"},
+{p:1,t:"sa",q:"จงหาผลบวก 1/2 + 1/6 + 1/12 + 1/20 (ตอบเป็นเศษส่วนอย่างต่ำ)",a:["4/5","0.8"],
+e:"ตัวส่วนคือ 1×2, 2×3, 3×4, 4×5 → ใช้ 1/(n(n+1)) = 1/n − 1/(n+1)<br>(1 − 1/2)+(1/2 − 1/3)+(1/3 − 1/4)+(1/4 − 1/5) หักล้างเหลือ 1 − 1/5 = <b class='key'>4/5</b>"},
+{p:2,t:"sa",q:"ห้องเรียนมีนักเรียน 45 คน เป็นชาย 60% ต่อมาชายย้ายออก 3 คน จงหาอัตราส่วนชายต่อหญิงขณะนี้ (อย่างต่ำ เช่น 5:3)",a:["4:3"],
+e:"ชายเดิม 60% ของ 45 = 27 คน, หญิง 18 คน → ชายเหลือ 24 คน<br>24 : 18 หารด้วย 6 = <b class='key'>4 : 3</b>"},
+{p:2,t:"sa",q:"พ่อค้าซื้อสินค้ามาราคา 1,500 บาท ขายไปขาดทุน 12% จงหาราคาขาย (บาท)",a:["1320"],
+e:"ขาดทุน 12% = ขายได้ 88% ของทุน → 1,500 × 0.88 = <b class='key'>1,320 บาท</b>"},
+{p:3,t:"sa",q:"ก ทำงานคนเดียวเสร็จใน 18 วัน เมื่อทำไปแล้ว 6 วัน ข มาช่วย (ข ทำคนเดียวเสร็จใน 9 วัน) ต้องช่วยกันทำอีกกี่วันงานจึงเสร็จ",a:["4"],
+e:"ก ทำไปแล้ว 6/18 = 1/3 → เหลือ 2/3<br>ช่วยกันได้วันละ 1/18 + 1/9 = 3/18 = 1/6<br>(2/3) ÷ (1/6) = <b class='key'>4 วัน</b>"},
+{p:3,t:"sa",q:"รถออกจากเมือง A เวลา 08:00 น. ความเร็วคงที่ 45 กม./ชม. ถึงเมือง B เวลา 11:20 น. ระยะทางกี่กิโลเมตร",a:["150"],
+e:"เวลาที่ใช้ = 3 ชม. 20 นาที = 10/3 ชม.<br>ระยะทาง = 45 × 10/3 = <b class='key'>150 กิโลเมตร</b>"},
+{p:4,t:"sa",q:"สี่เหลี่ยมคางหมูมีด้านคู่ขนานยาว 12 ซม. และ 18 ซม. สูง 10 ซม. จงหาพื้นที่ (ตร.ซม.)",a:["150"],
+e:"½ × (12 + 18) × 10 = ½ × 30 × 10 = <b class='key'>150 ตร.ซม.</b>"},
+{p:4,t:"sa",q:"ถังทรงกระบอกรัศมีฐาน 7 ซม. สูง 15 ซม. จงหาปริมาตร (ลบ.ซม., π ≈ 22/7)",a:["2310"],
+e:"πr²h = (22/7) × 49 × 15 = 154 × 15 = <b class='key'>2,310 ลบ.ซม.</b>"},
+{p:5,t:"sa",q:"กำหนดลำดับ 1, 3, 6, 10, 15, … จงหาพจน์ที่ 20",a:["210"],
+e:"เป็นจำนวนสามเหลี่ยม พจน์ที่ n = n(n+1)/2<br>พจน์ที่ 20 = (20 × 21) ÷ 2 = <b class='key'>210</b>"},
+{p:5,t:"sa",q:"งานเลี้ยงมีผู้ร่วมงาน 12 คน จับมือทักทายกันครบทุกคน คนละ 1 ครั้ง จะจับมือทั้งหมดกี่ครั้ง",a:["66"],
+e:"12 × 11 = 132 แต่นับซ้ำคู่ละ 2 ครั้ง → 132 ÷ 2 = <b class='key'>66 ครั้ง</b> (สูตร n(n−1)/2)"}
+],
+2:[
+{p:1,t:"mc",q:"เลขโดดในหลักหน่วยของ 7²⁰²³ คือเลขใด",c:["1","3","7","9"],a:1,
+e:"หลักหน่วยของ 7 วนรอบละ 4: 7, 9, 3, 1 ; 2023 ÷ 4 = 505 เศษ 3 → ตัวที่ 3 = <b class='key'>3</b>"},
+{p:1,t:"mc",q:"จำนวนนับน้อยที่สุดซึ่งหารด้วย 5 เหลือเศษ 2 และหารด้วย 7 เหลือเศษ 3",c:["12","17","22","31"],a:1,
+e:"หาร 5 เหลือ 2 ได้ 2, 7, 12, 17, … ตรวจกับ 7: 17 ÷ 7 = 2 เศษ 3 ✓ → <b class='key'>17</b>"},
+{p:1,t:"mc",q:"360 มีตัวประกอบที่เป็นจำนวนนับทั้งหมดกี่ตัว",c:["18","20","24","30"],a:2,
+e:"360 = 2³ × 3² × 5 ; คูณ (เลขชี้กำลัง + 1) → 4 × 3 × 2 = <b class='key'>24 ตัว</b>"},
+{p:1,t:"mc",q:"2¹⁰ ÷ 4³ × 8 มีค่าเท่าใด",c:["16","64","128","256"],a:2,
+e:"ทำฐานให้เท่ากัน 4³ = 2⁶, 8 = 2³ → 2^(10−6+3) = 2⁷ = <b class='key'>128</b>"},
+{p:2,t:"mc",q:"สินค้าขึ้นราคา 25% ต่อมาลดราคาลง 20% ราคาสุดท้ายเปลี่ยนแปลงอย่างไร",c:["เพิ่มขึ้น 5%","ลดลง 5%","เท่าเดิม","เพิ่มขึ้น 2.5%"],a:2,
+e:"ตัวคูณต่อเนื่อง 1.25 × 0.80 = 1.00 → <b class='key'>ราคาเท่าเดิม</b> (ห้ามบวก-ลบเปอร์เซ็นต์ตรง ๆ)"},
+{p:2,t:"mc",q:"ถ้า ก : ข = 3 : 4 และ ข : ค = 6 : 5 เมื่อ ค = 200 แล้ว ก มีค่าเท่าใด",c:["120","150","180","240"],a:2,
+e:"ทำ ข เท่ากัน: 9 : 12 และ 12 : 10 → ก : ข : ค = 9 : 12 : 10<br>ค = 10 ส่วน = 200 → 1 ส่วน = 20 → ก = <b class='key'>180</b>"},
+{p:2,t:"mc",q:"น้ำเชื่อมเข้มข้น 30% จำนวน 200 กรัม ผสมน้ำเปล่า 300 กรัม ได้ความเข้มข้นร้อยละเท่าใด",c:["10%","12%","15%","18%"],a:1,
+e:"น้ำตาล = 60 กรัม (เติมน้ำไม่เพิ่มน้ำตาล) ; รวม 500 กรัม → 60/500 = <b class='key'>12%</b>"},
+{p:2,t:"mc",q:"ขายสินค้าราคา 960 บาท ได้กำไร 20% ของราคาทุน ราคาทุนเท่าใด",c:["768","800","820","840"],a:1,
+e:"ราคาขาย = 120% ของทุน → 960 ÷ 1.20 = <b class='key'>800 บาท</b> (ห้ามคิด 960 × 0.8)"},
+{p:3,t:"mc",q:"ก ทำงานเร็วเป็น 2 เท่าของ ข ช่วยกันทำเสร็จใน 8 วัน ถ้า ข ทำคนเดียวจะเสร็จในกี่วัน",c:["12 วัน","16 วัน","20 วัน","24 วัน"],a:3,
+e:"ให้ ข = b ต่อวัน, ก = 2b → 3b = 1/8 → b = 1/24 → ข ใช้ <b class='key'>24 วัน</b>"},
+{p:3,t:"mc",q:"ท่อ A เติมเต็มใน 20 นาที ท่อ B เติมเต็มใน 30 นาที ท่อ C ระบายหมดใน 60 นาที เปิดทั้งสามพร้อมกันน้ำจะเต็มถังในกี่นาที",c:["12 นาที","15 นาที","18 นาที","20 นาที"],a:1,
+e:"ท่อระบายต้องลบออก: 1/20 + 1/30 − 1/60 = (9 + 6 − 3)/180 = 12/180 = 1/15 → <b class='key'>15 นาที</b>"},
+{p:3,t:"mc",q:"เมือง A และ B ห่างกัน 240 กม. รถสองคันออกพร้อมกันวิ่งเข้าหากันด้วยความเร็ว 50 และ 70 กม./ชม. จะพบกันหลังออกเดินทางกี่ชั่วโมง",c:["1.5 ชม.","2 ชม.","2.5 ชม.","3 ชม."],a:1,
+e:"วิ่งเข้าหากันใช้ผลบวกความเร็ว = 120 กม./ชม. → 240 ÷ 120 = <b class='key'>2 ชั่วโมง</b>"},
+{p:3,t:"mc",q:"คนงาน 15 คน ทำงาน 12 วัน ได้ผลงาน 60% ถ้าต้องการให้ส่วนที่เหลือเสร็จใน 6 วัน ต้องเพิ่มคนงานอีกกี่คน",c:["3 คน","5 คน","8 คน","10 คน"],a:1,
+e:"ทำแล้ว 15 × 12 = 180 คน-วัน = 60% → งานทั้งหมด 300 คน-วัน → เหลือ 120 คน-วัน<br>120 ÷ 6 = 20 คน → เพิ่มอีก <b class='key'>5 คน</b>"},
+{p:4,t:"mc",q:"ผลบวกของมุมภายในทั้งหมดของรูปสิบสองเหลี่ยมมีค่ากี่องศา",c:["1,440°","1,620°","1,800°","2,160°"],a:2,
+e:"(n − 2) × 180 = 10 × 180 = <b class='key'>1,800°</b>"},
+{p:4,t:"mc",q:"สามเหลี่ยมมุมฉากมีด้านประกอบมุมฉากยาว 9 ซม. และ 12 ซม. มีเส้นรอบรูปเท่าใด",c:["30 ซม.","33 ซม.","36 ซม.","40 ซม."],a:2,
+e:"พีทาโกรัส √(81 + 144) = 15 ซม. → 9 + 12 + 15 = <b class='key'>36 ซม.</b> (สามเหลี่ยม 3-4-5 คูณ 3)"},
+{p:4,t:"mc",q:"วงกลมสองวงศูนย์กลางร่วม รัศมี 10 ซม. และ 6 ซม. พื้นที่วงแหวนเท่าใด (π ≈ 3.14)",c:["100.48","150.72","200.96","314.00"],a:2,
+e:"π(R² − r²) = 3.14 × (100 − 36) = 3.14 × 64 = <b class='key'>200.96 ตร.ซม.</b>"},
+{p:4,t:"mc",q:"ลูกบาศก์มีปริมาตร 512 ลบ.ซม. มีพื้นที่ผิวทั้งหมดเท่าใด",c:["256 ตร.ซม.","320 ตร.ซม.","384 ตร.ซม.","512 ตร.ซม."],a:2,
+e:"ด้าน = ∛512 = 8 ซม. → พื้นที่ผิว 6s² = 6 × 64 = <b class='key'>384 ตร.ซม.</b>"},
+{p:5,t:"mc",q:"จงหาพจน์ถัดไปของลำดับ 2, 6, 14, 30, 62, ___",c:["96","124","126","128"],a:2,
+e:"กฎคือ ×2 แล้ว +2 → 62 × 2 + 2 = <b class='key'>126</b> (แต่ละพจน์คือ 2ⁿ⁺¹ − 2)"},
+{p:5,t:"mc",q:"ข้อมูล 3, 5, 7, 7, 8, 12, 14 ค่าเฉลี่ยเลขคณิตมากกว่ามัธยฐานอยู่เท่าใด",c:["0","1","1.5","2"],a:1,
+e:"ค่าเฉลี่ย = 56 ÷ 7 = 8 ; มัธยฐาน (ตำแหน่งที่ 4) = 7 → ต่างกัน <b class='key'>1</b>"},
+{p:5,t:"mc",q:"ในกล่องมีลูกบอล 5 สี สีละ 8 ลูก หยิบในที่มืดต้องหยิบอย่างน้อยกี่ลูกจึงมั่นใจว่าได้สีเดียวกัน 3 ลูก",c:["6 ลูก","11 ลูก","13 ลูก","16 ลูก"],a:1,
+e:"กรณีแย่ที่สุดได้สีละ 2 ลูกครบ 5 สี = 10 ลูก ; ลูกที่ 11 ต้องทำให้สีใดสีหนึ่งครบ 3 → <b class='key'>11 ลูก</b>"},
+{p:5,t:"mc",q:"วันที่ 1 มกราคมของปีหนึ่ง (ไม่ใช่ปีอธิกสุรทิน) ตรงกับวันพุธ วันที่ 1 มีนาคมปีเดียวกันตรงกับวันอะไร",c:["วันพฤหัสบดี","วันศุกร์","วันเสาร์","วันอาทิตย์"],a:2,
+e:"31 + 28 = 59 วัน ; 59 ÷ 7 = 8 เศษ 3 → พุธ + 3 = <b class='key'>วันเสาร์</b>"},
+{p:1,t:"sa",q:"จงหาผลบวก 1/(1×3) + 1/(3×5) + 1/(5×7) + … + 1/(19×21) (ตอบเป็นเศษส่วนอย่างต่ำ)",a:["10/21"],
+e:"ใช้ 1/((2k−1)(2k+1)) = ½[1/(2k−1) − 1/(2k+1)]<br>ผลบวก = ½(1 − 1/21) = ½ × 20/21 = <b class='key'>10/21</b>"},
+{p:1,t:"sa",q:"จำนวนเต็มสามหลักที่หารด้วย 6 ลงตัว มีทั้งหมดกี่จำนวน",a:["150"],
+e:"ตัวแรก 102 (6×17) ตัวสุดท้าย 996 (6×166) → 166 − 17 + 1 = <b class='key'>150 จำนวน</b>"},
+{p:2,t:"sa",q:"พ่อค้าติดราคาสูงกว่าทุน 50% แล้วลดให้ลูกค้า 20% ปรากฏว่าได้กำไร 600 บาท จงหาราคาทุน (บาท)",a:["3000"],
+e:"ทุน c → ติดราคา 1.5c → ขายจริง 1.5c × 0.8 = 1.2c<br>กำไร 0.2c = 600 → c = <b class='key'>3,000 บาท</b>"},
+{p:2,t:"sa",q:"น้ำเกลือเข้มข้น 15% จำนวน 600 กรัม ต้องระเหยน้ำออกกี่กรัม จึงได้ความเข้มข้น 25%",a:["240"],
+e:"เกลือ = 90 กรัม (ระเหยน้ำ เกลือไม่หาย)<br>น้ำหนักใหม่ = 90 ÷ 0.25 = 360 → ระเหยออก 600 − 360 = <b class='key'>240 กรัม</b>"},
+{p:3,t:"sa",q:"ก ข ค ช่วยกันทำงานเสร็จใน 4 วัน ถ้า ก คนเดียวเสร็จใน 12 วัน ข คนเดียวเสร็จใน 18 วัน ค ทำคนเดียวจะเสร็จในกี่วัน",a:["9"],
+e:"ใช้ตัวส่วนร่วม 36: รวม = 9/36, ก = 3/36, ข = 2/36<br>ค = 9/36 − 3/36 − 2/36 = 4/36 = 1/9 → <b class='key'>9 วัน</b>"},
+{p:3,t:"sa",q:"รถไฟยาว 200 เมตร ความเร็ว 72 กม./ชม. ผ่านสะพานยาว 400 เมตร ตั้งแต่หัวขบวนถึงสะพานจนท้ายขบวนพ้นสะพาน ใช้เวลากี่วินาที",a:["30"],
+e:"72 กม./ชม. = 20 เมตร/วินาที<br>ระยะที่ต้องวิ่ง = 400 + 200 = 600 เมตร (ต้องบวกความยาวขบวน)<br>600 ÷ 20 = <b class='key'>30 วินาที</b>"},
+{p:4,t:"sa",q:"สี่เหลี่ยมจัตุรัสด้านยาว 14 ซม. เขียนวงกลมแนบในสัมผัสทั้งสี่ด้าน จงหาพื้นที่ส่วนนอกวงกลมแต่อยู่ในจัตุรัส (ตร.ซม., π ≈ 22/7)",a:["42"],
+e:"พื้นที่จัตุรัส = 196 ; วงกลมรัศมี 7 → พื้นที่ 154<br>196 − 154 = <b class='key'>42 ตร.ซม.</b>"},
+{p:4,t:"sa",q:"ปริซึมสามเหลี่ยมฐานมุมฉากด้านประกอบ 6 ซม. และ 8 ซม. สูง 10 ซม. จงหาปริมาตรและพื้นที่ผิวทั้งหมด (ตอบสองค่า เช่น 520,680)",a:["240,288","288,240"],
+e:"<b>ปริมาตร</b> = พื้นที่ฐาน 24 × สูง 10 = <b class='key'>240 ลบ.ซม.</b><br><b>พื้นที่ผิว</b> ด้านตรงข้ามมุมฉาก 10 → เส้นรอบฐาน 24<br>ข้าง 24 × 10 = 240 ; ฐาน 2 หน้า = 48 → รวม <b class='key'>288 ตร.ซม.</b>"},
+{p:5,t:"sa",q:"กำหนดลำดับ 1, 2, 4, 7, 11, 16, … จงหาพจน์ที่ 20",a:["191"],
+e:"ผลต่างเพิ่มทีละ 1 → พจน์ที่ n = 1 + (n−1)n/2<br>พจน์ที่ 20 = 1 + (19 × 20)/2 = 1 + 190 = <b class='key'>191</b>"},
+{p:5,t:"sa",q:"มีเหรียญ 27 เหรียญ มี 1 เหรียญเบากว่าเพื่อน ใช้ตาชั่งสองแขน ต้องชั่งอย่างน้อยกี่ครั้งจึงหาเหรียญเบาได้แน่นอน",a:["3"],
+e:"ตาชั่ง 1 ครั้งให้ผล 3 แบบ จึงคัดได้ทีละ 3 เท่า ; 27 = 3³ → <b class='key'>3 ครั้ง</b><br>ครั้งที่ 1 แบ่ง 3 กอง กองละ 9 → เหลือ 9<br>ครั้งที่ 2 แบ่งกองละ 3 → เหลือ 3<br>ครั้งที่ 3 ชั่ง 2 เหรียญ หาตัวเบาได้"}
+]};
+
+const KEY="kpmath_ipad_v1";
+let cur=1,elapsed=0,running=true,submitted=false,lastTick=Date.now(),activeInput=null;
+const LIMIT=120*60;
+
+function save(){
+  const ans={};
+  DATA[cur].forEach((o,i)=>{
+    if(o.t==="mc"){const s=document.querySelector("input[name=n"+i+"]:checked");if(s)ans[i]=s.value;}
+    else{const v=document.getElementById("s"+i);if(v&&v.value.trim())ans[i]=v.value;}
+  });
+  try{localStorage.setItem(KEY,JSON.stringify({cur:cur,elapsed:elapsed,ans:ans,ts:Date.now()}));}catch(e){}
+}
+function load(){try{return JSON.parse(localStorage.getItem(KEY));}catch(e){return null;}}
+function clearSave(){try{localStorage.removeItem(KEY);}catch(e){}}
+
+function norm(s){
+  return (s||"").toString().trim().toLowerCase().replace(/[,\s]/g,"")
+    .replace(/บาท|วัน|นาที|วินาที|ชั่วโมง|กรัม|กิโลกรัม|กิโลเมตร|เมตร|เซนติเมตร|ซม\.?|กม\.?|ตร\.|ลบ\.|คน|ครั้ง|ลูก|จำนวน|องศา|°|%/g,"");
+}
+function saOK(v,acc){const x=norm(v);if(!x)return false;return acc.some(a=>norm(a)===x);}
+
+function render(restore){
+  const qs=DATA[cur];let h="",lp=0,lt="";
+  qs.forEach((o,i)=>{
+    if(o.t!==lt){h+='<div class="secthead">'+(o.t==="mc"?"ตอนปรนัย — แตะเลือกคำตอบ (ข้อละ 1 คะแนน)":"ตอนอัตนัย — แตะช่องเพื่อกรอกคำตอบ (ข้อละ 2 คะแนน)")+"</div>";lt=o.t;lp=0;}
+    if(o.p!==lp){h+='<div class="part">'+PARTS[o.p]+"</div>";lp=o.p;}
+    h+='<div class="q" id="q'+i+'"><div><span class="qnum">ข้อ '+(i+1)+'.</span> '+o.q+' <span class="mark" id="m'+i+'"></span></div>';
+    if(o.t==="mc"){
+      h+='<div class="choices">';
+      o.c.forEach((c,j)=>{h+='<label id="l'+i+'_'+j+'"><input type="radio" name="n'+i+'" value="'+j+'"><span>'+"กขคง"[j]+". "+c+"</span></label>";});
+      h+="</div>";
+    }else{
+      h+='<div class="sa"><input type="text" id="s'+i+'" inputmode="none" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="แตะเพื่อกรอกคำตอบ"></div><div class="hint">เศษส่วนใช้ / • อัตราส่วนใช้ : • สองค่าคั่นด้วย ,</div>';
+    }
+    h+='<div class="tools"><button onclick="toggleExp('+i+')">ดูเฉลยข้อนี้</button></div><div class="exp" id="e'+i+'"><b>เฉลย:</b> '+(o.t==="mc"?"ข้อ "+"กขคง"[o.a]+" — ":"")+o.e+"</div></div>";
+  });
+  document.getElementById("quiz").innerHTML=h;
+  document.getElementById("result").className="";
+  submitted=false;
+
+  qs.forEach((o,i)=>{
+    if(o.t==="mc"){
+      document.querySelectorAll("input[name=n"+i+"]").forEach(el=>{
+        el.addEventListener("change",()=>{
+          document.querySelectorAll("#q"+i+" .choices label").forEach(l=>l.classList.remove("sel"));
+          el.parentNode.classList.add("sel");upd();save();
+        });
+      });
+    }else{
+      const el=document.getElementById("s"+i);
+      el.addEventListener("focus",e=>{e.preventDefault();activeInput=el;showPad();el.blur();});
+      el.addEventListener("click",()=>{activeInput=el;showPad();});
+    }
+  });
+  if(restore&&restore.ans){
+    Object.keys(restore.ans).forEach(i=>{
+      const o=qs[i];if(!o)return;
+      if(o.t==="mc"){const s=document.querySelector("input[name=n"+i+"][value='"+restore.ans[i]+"']");
+        if(s){s.checked=true;s.parentNode.classList.add("sel");}}
+      else{const el=document.getElementById("s"+i);if(el)el.value=restore.ans[i];}
+    });
+  }
+  upd();
+}
+function toggleExp(i){document.getElementById("e"+i).classList.toggle("show");}
+function countDone(){
+  let d=0;DATA[cur].forEach((o,i)=>{
+    if(o.t==="mc"){if(document.querySelector("input[name=n"+i+"]:checked"))d++;}
+    else{const el=document.getElementById("s"+i);if(el&&el.value.trim())d++;}
+  });return d;
+}
+function upd(){
+  const d=countDone();
+  document.getElementById("progress").textContent="ทำแล้ว "+d+"/30";
+  document.getElementById("prog2").textContent=d+"/30";
+}
+function showPad(){
+  document.getElementById("pad").classList.add("show");
+  if(activeInput){activeInput.style.borderColor="#1a5f9e";
+    activeInput.scrollIntoView({behavior:"smooth",block:"center"});}
+}
+function hidePad(){document.getElementById("pad").classList.remove("show");
+  if(activeInput)activeInput.style.borderColor="";activeInput=null;save();}
+document.querySelectorAll("#padGrid button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    if(!activeInput)return;
+    const k=b.getAttribute("data-k");
+    if(k==="OK"){hidePad();return;}
+    if(k==="BS"){activeInput.value=activeInput.value.slice(0,-1);}
+    else{activeInput.value+=k;}
+    upd();save();
+  });
+});
+function tick(){
+  const now=Date.now();
+  if(running&&!submitted)elapsed+=Math.round((now-lastTick)/1000);
+  lastTick=now;
+  const m=String(Math.floor(elapsed/60)).padStart(2,"0"),s=String(elapsed%60).padStart(2,"0");
+  const c=document.getElementById("clock");
+  c.textContent=m+":"+s+" / 120:00";
+  c.className="clock"+(elapsed>=LIMIT?" over":elapsed>=100*60?" warn":"");
+  if(elapsed>=LIMIT&&!submitted)submit();
+}
+function submit(){
+  if(submitted)return;submitted=true;running=false;hidePad();
+  const qs=DATA[cur];let sc=0,full=0;const st={1:[0,0],2:[0,0],3:[0,0],4:[0,0],5:[0,0]};
+  qs.forEach((o,i)=>{
+    const pt=o.t==="mc"?1:2;full+=pt;st[o.p][1]+=pt;let ok=false;
+    if(o.t==="mc"){const s=document.querySelector("input[name=n"+i+"]:checked");ok=s&&Number(s.value)===o.a;}
+    else{ok=saOK(document.getElementById("s"+i).value,o.a);}
+    if(ok){sc+=pt;st[o.p][0]+=pt;}
+    document.getElementById("q"+i).classList.add(ok?"correct":"wrong");
+    const mk=document.getElementById("m"+i);mk.textContent=ok?"✓ ถูก":"✗ ผิด";
+    mk.className="mark "+(ok?"ok":"no");
+    document.getElementById("e"+i).classList.add("show");
+  });
+  const pct=Math.round(sc/full*1000)/10,mm=Math.floor(elapsed/60),ss=elapsed%60;
+  let g,gt;
+  if(pct>=85){g="ยอดเยี่ยม";gt="พร้อมสอบห้องเรียนพิเศษ มีลุ้นติดสูง ให้เน้นฝึกความเร็วและความรอบคอบ";}
+  else if(pct>=67){g="ดี";gt="พื้นฐานแน่น เหลือเก็บจุดอ่อนเฉพาะตอนที่ผิดซ้ำ ๆ";}
+  else if(pct>=50){g="พอใช้";gt="ต้องทบทวนเนื้อหาเป็นตอน ๆ โดยเฉพาะหมวดที่คะแนนต่ำ";}
+  else{g="ต้องปรับปรุง";gt="แนะนำกลับไปเริ่มที่โจทย์พื้นฐานแต่ละหัวข้อก่อน แล้วค่อยกลับมาทำใหม่";}
+  let rows="",weak=[];
+  for(let p=1;p<=5;p++){
+    const r=Math.round(st[p][0]/st[p][1]*100);
+    rows+='<tr><td class="left">'+PARTS[p]+"</td><td>"+st[p][0]+"/"+st[p][1]+"</td><td>"+r+"%</td><td>"+(r>=70?"✅ ผ่าน":r>=50?"⚠️ ควรทบทวน":"❌ ต้องเสริม")+"</td></tr>";
+    if(r<70)weak.push({n:PARTS[p],r:r});
+  }
+  weak.sort((a,b)=>a.r-b.r);
+  const wbox=weak.length===0
+    ?'<div class="weak good"><b>เยี่ยมมาก!</b> ทำได้ดีทุกหมวด (ไม่มีหมวดใดต่ำกว่า 70%) ขั้นต่อไปลองลดเวลาเหลือ 90 นาทีเพื่อฝึกความเร็ว</div>'
+    :'<div class="weak"><b>หมวดที่ควรศึกษาเพิ่มเติม (เรียงจากเร่งด่วนที่สุด)</b><ol style="margin:8px 0 0;padding-left:24px;">'+weak.map(w=>"<li><b>"+w.n+"</b> — ได้ "+w.r+"%</li>").join("")+"</ol></div>";
+  document.getElementById("result").innerHTML=
+    "<h2 style='margin:0 0 8px;'>สรุปผลการสอบ — "+(cur===1?"ชุดที่ 1":"ชุดที่ 2")+"</h2>"+
+    '<div class="big">'+sc+" / "+full+" คะแนน</div>"+
+    "<div style='font-size:28px;font-weight:800;color:#0a8a4a;'>"+pct+"%</div>"+
+    "<div style='margin-top:8px;'>ระดับผล: <b>"+g+"</b> — "+gt+"</div>"+
+    "<div style='margin-top:4px;'>เวลาที่ใช้ทำข้อสอบ: <b>"+mm+" นาที "+ss+" วินาที</b> (จาก 120 นาที)"+(elapsed>=LIMIT?" — <span style='color:#c62828'>หมดเวลา ระบบส่งอัตโนมัติ</span>":"")+"</div>"+
+    "<table><thead><tr><th class='left'>หมวดเนื้อหา</th><th>คะแนน</th><th>ร้อยละ</th><th>ประเมิน</th></tr></thead><tbody>"+rows+"</tbody></table>"+wbox;
+  document.getElementById("result").className="show";
+  document.getElementById("result").scrollIntoView({behavior:"smooth"});
+  clearSave();
+}
+document.getElementById("btnSubmit").onclick=function(){
+  const d=countDone();
+  if(d<30&&!confirm("ยังทำไม่ครบ ("+d+"/30 ข้อ) ต้องการส่งคำตอบเลยหรือไม่?"))return;
+  submit();
+};
+document.getElementById("btnPause").onclick=function(){
+  if(running){running=false;this.textContent="ทำต่อ";}else{running=true;lastTick=Date.now();this.textContent="หยุดพัก";}
+};
+document.getElementById("btnReset").onclick=function(){
+  if(!confirm("ล้างคำตอบทั้งหมดและเริ่มจับเวลาใหม่?"))return;
+  clearSave();elapsed=0;running=true;lastTick=Date.now();
+  document.getElementById("btnPause").textContent="หยุดพัก";
+  document.getElementById("banner").className="banner";render(null);window.scrollTo(0,0);
+};
+document.getElementById("setSel").onchange=function(){
+  cur=Number(this.value);clearSave();elapsed=0;running=true;lastTick=Date.now();
+  document.getElementById("btnPause").textContent="หยุดพัก";
+  document.getElementById("banner").className="banner";render(null);window.scrollTo(0,0);
+};
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden){save();}else{lastTick=Date.now();}
+});
+window.addEventListener("pagehide",save);
+setInterval(save,10000);
+
+const saved=load();
+if(saved&&saved.ans&&Object.keys(saved.ans).length>0){
+  cur=saved.cur||1;elapsed=saved.elapsed||0;
+  document.getElementById("setSel").value=String(cur);
+  const b=document.getElementById("banner");
+  b.innerHTML="กู้คืนคำตอบที่บันทึกไว้อัตโนมัติแล้ว ("+Object.keys(saved.ans).length+" ข้อ) — ทำต่อได้เลย หรือกดปุ่ม <b>เริ่มใหม่</b> ด้านบนเพื่อล้างทั้งหมด";
+  b.className="banner show";
+  render(saved);
+}else{render(null);}
+lastTick=Date.now();setInterval(tick,500);tick();
+</script>
+</body>
+</html>
